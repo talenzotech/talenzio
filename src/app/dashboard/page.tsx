@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { signout } from '../(auth)/actions'
 import { LogOut, FileText, CheckSquare, Video, Briefcase, Unlock, ArrowRight, Sparkles, TrendingUp, BookOpen, CalendarDays, Clock } from 'lucide-react'
 
@@ -9,7 +10,11 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const userMetadata = user?.user_metadata || {}
+  if (!user) {
+    redirect('/login')
+  }
+
+  const userMetadata = user.user_metadata || {}
   const fullName = userMetadata.full_name || 'Guest'
   const firstName = fullName.split(' ')[0]
   const avatarUrl = userMetadata.avatar_url || null

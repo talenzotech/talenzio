@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Clock, ArrowRight, ArrowLeft, CheckCircle2, Award } from 'lucide-react'
-
-type Question = {
-  id: string;
-  text: string;
-  options: string[];
-  correct: number;
-  explanation?: string;
-}
+import type { Question } from '@/utils/googleSheets'
 
 export default function TestInterface({ 
   category, 

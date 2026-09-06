@@ -2,7 +2,15 @@ import Link from 'next/link'
 import { login, loginWithOAuth } from '../actions'
 import { ArrowRight, Mail, Lock } from 'lucide-react'
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string; message?: string }>
+}) {
+  const params = await searchParams
+  const error = params?.error
+  const message = params?.message
+
   return (
     <div className="w-full">
       <div className="text-center mb-10">
@@ -11,6 +19,17 @@ export default function LoginPage() {
           Enter your details to access your account
         </p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 text-sm text-red-600 bg-red-50 dark:bg-red-950/40 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900/60">
+          {error}
+        </div>
+      )}
+      {message && (
+        <div className="mb-6 p-4 text-sm text-green-600 bg-green-50 dark:bg-green-950/40 dark:text-green-400 rounded-xl border border-green-200 dark:border-green-900/60">
+          {message}
+        </div>
+      )}
 
       <form className="space-y-5">
         <div className="space-y-1">
