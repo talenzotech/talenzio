@@ -18,7 +18,6 @@ export default function UnlockProgramPage() {
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
@@ -61,6 +60,7 @@ export default function UnlockProgramPage() {
     setError(null);
 
     try {
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setError("You must be logged in.");
