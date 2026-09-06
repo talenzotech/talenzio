@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
-export async function login(formData: FormData) {
+export async function login(formData: FormData): Promise<void> {
   const supabase = await createClient()
 
   // type-casting here for convenience
@@ -13,7 +13,7 @@ export async function login(formData: FormData) {
   const password = formData.get('password') as string
 
   if (!email || !password) {
-    return { error: 'Email and password are required' }
+    redirect('/login?error=' + encodeURIComponent('Email and password are required'))
   }
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -22,14 +22,14 @@ export async function login(formData: FormData) {
   })
 
   if (error) {
-    return { error: error.message }
+    redirect('/login?error=' + encodeURIComponent(error.message))
   }
 
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
 
-export async function signup(formData: FormData) {
+export async function signup(formData: FormData): Promise<void> {
   const supabase = await createClient()
 
   // type-casting here for convenience
@@ -40,7 +40,7 @@ export async function signup(formData: FormData) {
   const referralCode = formData.get('referralCode') as string
 
   if (!email || !password || !fullName) {
-    return { error: 'All fields are required' }
+    redirect('/register?error=' + encodeURIComponent('All fields are required'))
   }
 
   const { error, data } = await supabase.auth.signUp({
@@ -55,7 +55,7 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    return { error: error.message }
+    redirect('/register?error=' + encodeURIComponent(error.message))
   }
   
   if (data.session) {
@@ -63,10 +63,10 @@ export async function signup(formData: FormData) {
     redirect('/dashboard')
   }
 
-  return { success: 'Check your email for the confirmation link.' }
+  redirect('/login?message=' + encodeURIComponent('Check your email for the confirmation link.'))
 }
 
-export async function loginWithOAuth(provider: 'google' | 'linkedin_oidc') {
+export async function loginWithOAuth(provider: 'google' | 'linkedin_oidc'): Promise<void> {
   const supabase = await createClient()
   
   // NOTE: Assuming your NEXT_PUBLIC_APP_URL is set in .env.local
@@ -83,7 +83,7 @@ export async function loginWithOAuth(provider: 'google' | 'linkedin_oidc') {
   })
 
   if (error) {
-    return { error: error.message }
+    redirect('/login?error=' + encodeURIComponent(error.message))
   }
 
   if (data.url) {

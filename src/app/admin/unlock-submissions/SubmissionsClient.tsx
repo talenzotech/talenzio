@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { reviewSubmission } from './actions';
 import { Loader2, CheckCircle, XCircle, ExternalLink, User } from 'lucide-react';
 
-type Submission = {
+export type Submission = {
   id: string;
   status: string;
   created_at: string;

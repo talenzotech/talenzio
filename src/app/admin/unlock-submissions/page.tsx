@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import SubmissionsClient from './SubmissionsClient';
+import SubmissionsClient, { type Submission } from './SubmissionsClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,18 +31,31 @@ export default async function AdminUnlockSubmissionsPage() {
   // or we can generate signed URLs or use the client supabase to download.
   // It's easier to generate signed URLs here.
   
-  const submissionsWithUrls = await Promise.all(
-    (submissions || []).map(async (sub) => {
+  const submissionsWithUrls: Submission[] = await Promise.all(
+    (submissions || []).map(async (sub: any) => {
       const evidence = await Promise.all((sub.unlock_evidence || []).map(async (ev: any) => {
         const { data } = await supabase.storage
           .from('unlock_evidence')
           .createSignedUrl(ev.storage_path, 60 * 60); // 1 hour
         return {
-          ...ev,
+          id: ev.id,
+          storage_path: ev.storage_path,
+          evidence_type: ev.evidence_type,
           url: data?.signedUrl || null
         };
       }));
-      return { ...sub, unlock_evidence: evidence };
+      const profileData = Array.isArray(sub.profiles) ? sub.profiles[0] : sub.profiles;
+      return {
+        id: sub.id,
+        status: sub.status,
+        created_at: sub.created_at,
+        reviewer_note: sub.reviewer_note ?? null,
+        profiles: profileData ? {
+          full_name: profileData.full_name ?? null,
+          avatar_url: profileData.avatar_url ?? null,
+        } : null,
+        unlock_evidence: evidence,
+      };
     })
   );
 
